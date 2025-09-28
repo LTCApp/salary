@@ -221,11 +221,21 @@ class FinancialAnalyzer {
     extractNameFromNotes(notes) {
         if (!notes || notes.trim() === '') return null;
         
+        // التحقق من وجود الكلمة الأساسية المُستثناة
+        const baseKeyword = 'مبيعات اجل';
+        const cleanOriginalNotes = notes.trim();
+        
+        // إذا كانت الملاحظة تحتوي فقط على "مبيعات اجل" أو تساويها، استثنيها
+        if (cleanOriginalNotes === baseKeyword || 
+            cleanOriginalNotes.toLowerCase() === baseKeyword.toLowerCase()) {
+            return null;
+        }
+        
         // إزالة الكلمات الزائدة واستخراج الاسم
         let cleanNotes = notes.trim();
         
-        // إزالة الكلمات الشائعة مثل "عجز" و "خدمة"
-        const wordsToRemove = ['عجز', 'خدمة', 'خدمات', 'مدين', 'دائن', 'سلف', 'مشتريات'];
+        // إزالة الكلمات الشائعة مثل "عجز" و "خدمة" والكلمة الأساسية "مبيعات اجل"
+        const wordsToRemove = ['عجز', 'خدمة', 'خدمات', 'مدين', 'دائن', 'سلف', 'مشتريات', 'مبيعات اجل'];
         
         wordsToRemove.forEach(word => {
             cleanNotes = cleanNotes.replace(new RegExp(word, 'gi'), '');
@@ -236,6 +246,9 @@ class FinancialAnalyzer {
         
         // إزالة الفراغات الزائدة
         cleanNotes = cleanNotes.replace(/\s+/g, ' ').trim();
+        
+        // إذا لم يبق شيء بعد الإزالة، فهذا يعني أن الملاحظة كانت تحتوي فقط على كلمات مُستثناة
+        if (cleanNotes === '') return null;
         
         // التحقق من وجود اسم (على الأقل كلمتين)
         const words = cleanNotes.split(' ').filter(word => word.length > 1);
@@ -324,12 +337,11 @@ class FinancialAnalyzer {
         
         let content = '<div class="names-list">';
         
-        if (originalName) {
-            content += `<p class="original-name-text">الاسم الأساسي: ${originalName}</p>`;
-        }
+        // الكلمة الأساسية المُستثناة
+        content += `<p class="original-name-text">الكلمة الأساسية (مُستثناة): مبيعات اجل</p>`;
         
         if (differentNames.length > 0) {
-            content += `<p class="different-names-text">الأسماء المختلفة: ${differentNames.join('، ')}</p>`;
+            content += `<p class="different-names-text">الأسماء المختلفة الموجودة: ${differentNames.join('، ')}</p>`;
         }
         
         content += '</div>';
