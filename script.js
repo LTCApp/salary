@@ -267,8 +267,8 @@ class FinancialAnalyzer {
         document.getElementById('advancesCredit').textContent = this.formatNumber(this.results.advances.credit);
         document.getElementById('advancesNet').textContent = this.formatNumber(this.results.advances.net);
         
-        // عرض نتائج الأسماء
-        this.showNamesResults();
+        // عرض ملاحظة الأسماء المختلفة
+        this.showNamesNotification();
         
         // عرض الملخص النهائي
         document.getElementById('totalAdvances').textContent = this.formatNumber(this.results.advances.net);
@@ -306,67 +306,34 @@ class FinancialAnalyzer {
         }
     }
     
-    showNamesResults() {
+    showNamesNotification() {
         if (!this.namesResults || !this.namesResults.nameData) return;
         
-        const { originalName, differentNames, nameData } = this.namesResults;
-        const namesContainer = document.getElementById('namesContainer');
-        const namesSection = document.getElementById('namesSection');
+        const { originalName, differentNames } = this.namesResults;
+        const notification = document.getElementById('namesNotification');
+        const namesContent = document.getElementById('namesContent');
         
-        // مسح المحتوى السابق
-        namesContainer.innerHTML = '';
-        
-        // إذا لم يتم العثور على أسماء، إخفاء هذا القسم
-        if (!originalName && differentNames.length === 0) {
-            namesSection.style.display = 'none';
+        // إذا لم توجد أسماء مختلفة، إخفاء الإشعار
+        if (differentNames.length === 0) {
+            notification.style.display = 'none';
             return;
         }
         
-        // عرض قسم الأسماء
-        namesSection.style.display = 'block';
+        // عرض الإشعار
+        notification.style.display = 'block';
         
-        // عرض الاسم الأصلي
-        if (originalName && nameData[originalName]) {
-            const nameBox = this.createNameBox(originalName, nameData[originalName], true);
-            namesContainer.appendChild(nameBox);
+        let content = '<div class="names-list">';
+        
+        if (originalName) {
+            content += `<p class="original-name-text">الاسم الأساسي: ${originalName}</p>`;
         }
         
-        // عرض الأسماء المختلفة
-        differentNames.forEach(name => {
-            if (nameData[name]) {
-                const nameBox = this.createNameBox(name, nameData[name], false);
-                namesContainer.appendChild(nameBox);
-            }
-        });
-    }
-    
-    createNameBox(name, data, isOriginal) {
-        const nameBox = document.createElement('div');
-        nameBox.className = `name-box ${isOriginal ? 'original-name' : 'different-name'}`;
+        if (differentNames.length > 0) {
+            content += `<p class="different-names-text">الأسماء المختلفة: ${differentNames.join('، ')}</p>`;
+        }
         
-        nameBox.innerHTML = `
-            <h4>${name} ${isOriginal ? '(الاسم الأصلي)' : '(اسم مختلف)'}</h4>
-            <div class="calculation-grid">
-                <div class="calc-item">
-                    <span class="label">مدين:</span>
-                    <span class="value">${this.formatNumber(data.debit)}</span>
-                </div>
-                <div class="calc-item">
-                    <span class="label">دائن:</span>
-                    <span class="value">${this.formatNumber(data.credit)}</span>
-                </div>
-                <div class="calc-item total">
-                    <span class="label">الصافي:</span>
-                    <span class="value">${this.formatNumber(data.net)}</span>
-                </div>
-                <div class="calc-item">
-                    <span class="label">عدد العمليات:</span>
-                    <span class="value">${data.count}</span>
-                </div>
-            </div>
-        `;
-        
-        return nameBox;
+        content += '</div>';
+        namesContent.innerHTML = content;
     }
 }
 

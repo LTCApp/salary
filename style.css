@@ -218,62 +218,43 @@ header p {
     font-size: 1.3rem;
 }
 
-/* تنسيق مربعات الأسماء */
-.name-box {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+/* تنسيق ملاحظة الأسماء */
+.names-notification {
+    background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
     color: white;
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+    border-right: 5px solid #ff8f00;
 }
 
-.name-box:hover {
-    transform: translateY(-3px);
-}
-
-.name-box h4 {
+.notification-content h4 {
     color: white;
-    margin-bottom: 15px;
-    font-size: 1.3rem;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
     text-align: center;
-    border-bottom: 2px solid rgba(255,255,255,0.3);
-    padding-bottom: 10px;
 }
 
-.name-box .calculation-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
+.names-list {
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
 }
 
-.name-box .calc-item {
-    background: rgba(255,255,255,0.15);
-    border-right: 3px solid rgba(255,255,255,0.4);
-    backdrop-filter: blur(10px);
+.names-list p {
+    margin: 5px 0;
+    font-size: 0.95rem;
 }
 
-.name-box .calc-item.total {
-    background: rgba(255,255,255,0.25);
-    border-right-color: rgba(255,255,255,0.6);
-}
-
-.name-box .label {
-    color: white;
-}
-
-.name-box .value {
-    color: white;
+.original-name-text {
     font-weight: bold;
+    color: #fff3cd;
 }
 
-.original-name {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
-}
-
-.different-name {
-    background: linear-gradient(135deg, #fd7e14 0%, #e55a0b 100%) !important;
+.different-names-text {
+    color: #ffe8a1;
 }
 
 .loading {
