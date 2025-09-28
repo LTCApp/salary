@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحليل البيانات المالية</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>نظام تحليل البيانات المالية</h1>
+            <p>قم برفع ملف الإكسل لتحليل العجز والخدمات والسلف والمشتريات</p>
+        </header>
+        
+        <div class="upload-section">
+            <div class="upload-box">
+                <input type="file" id="excelFile" accept=".xlsx,.xls" hidden>
+                <label for="excelFile" class="upload-label">
+                    <i class="upload-icon">📁</i>
+                    <span>اختر ملف الإكسل</span>
+                </label>
+                <p class="file-info" id="fileInfo">لم يتم اختيار ملف</p>
+            </div>
+            <button id="processBtn" class="process-btn" disabled>تحليل البيانات</button>
+        </div>
+        
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <h2>نتائج التحليل</h2>
+            
+            <!-- مربع العجز -->
+            <div class="result-box">
+                <h3>تحليل العجز</h3>
+                <div class="calculation-grid">
+                    <div class="calc-item">
+                        <span class="label">عجز مدين:</span>
+                        <span class="value" id="deficitDebit">0</span>
+                    </div>
+                    <div class="calc-item">
+                        <span class="label">عجز دائن:</span>
+                        <span class="value" id="deficitCredit">0</span>
+                    </div>
+                    <div class="calc-item total">
+                        <span class="label">صافي العجز:</span>
+                        <span class="value" id="deficitNet">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- مربع الخدمات -->
+            <div class="result-box">
+                <h3>تحليل الخدمات</h3>
+                <div class="calculation-grid">
+                    <div class="calc-item">
+                        <span class="label">خدمات مدين:</span>
+                        <span class="value" id="serviceDebit">0</span>
+                    </div>
+                    <div class="calc-item">
+                        <span class="label">خدمات دائن:</span>
+                        <span class="value" id="serviceCredit">0</span>
+                    </div>
+                    <div class="calc-item total">
+                        <span class="label">صافي الخدمات:</span>
+                        <span class="value" id="serviceNet">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- مربع السلف والمشتريات -->
+            <div class="result-box">
+                <h3>السلف والمشتريات</h3>
+                <div class="calculation-grid">
+                    <div class="calc-item">
+                        <span class="label">مدين:</span>
+                        <span class="value" id="advancesDebit">0</span>
+                    </div>
+                    <div class="calc-item">
+                        <span class="label">دائن:</span>
+                        <span class="value" id="advancesCredit">0</span>
+                    </div>
+                    <div class="calc-item total">
+                        <span class="label">صافي السلف والمشتريات:</span>
+                        <span class="value" id="advancesNet">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- الإجمالي النهائي -->
+            <div class="result-box summary">
+                <h3>الملخص النهائي</h3>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span class="label">إجمالي السلف والمشتريات:</span>
+                        <span class="value" id="totalAdvances">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">خصم الخدمات:</span>
+                        <span class="value" id="totalServices">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">العجز:</span>
+                        <span class="value" id="totalDeficit">0</span>
+                    </div>
+                    <div class="summary-item final">
+                        <span class="label">الإجمالي النهائي:</span>
+                        <span class="value" id="grandTotal">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>جاري معالجة البيانات...</p>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
