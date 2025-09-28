@@ -134,6 +134,9 @@ class FinancialAnalyzer {
             advances: { debit: 0, credit: 0, net: 0 }
         };
         
+        // تحليل الأسماء
+        const namesAnalysis = this.analyzeNames();
+        
         this.data.forEach(row => {
             const notes = row.notes.toLowerCase();
             
@@ -162,8 +165,92 @@ class FinancialAnalyzer {
         results.advances.net = results.advances.debit - results.advances.credit;
         
         this.results = results;
+        this.namesResults = namesAnalysis;
     }
 
+    analyzeNames() {
+        const nameFrequency = {};
+        const nameData = {};
+        
+        // تجميع الأسماء وحساب تكرارها
+        this.data.forEach(row => {
+            // استخراج الاسم من الملاحظات
+            const name = this.extractNameFromNotes(row.notes);
+            if (name) {
+                // حساب التكرار
+                nameFrequency[name] = (nameFrequency[name] || 0) + 1;
+                
+                // تجميع البيانات المالية
+                if (!nameData[name]) {
+                    nameData[name] = { debit: 0, credit: 0, net: 0, count: 0 };
+                }
+                
+                nameData[name].debit += row.debit;
+                nameData[name].credit += row.credit;
+                nameData[name].count += 1;
+            }
+        });
+        
+        // حساب الصافي لكل اسم
+        Object.keys(nameData).forEach(name => {
+            nameData[name].net = nameData[name].debit - nameData[name].credit;
+        });
+        
+        // تحديد الاسم الأكثر تكراراً (الأصلي)
+        let originalName = '';
+        let maxFrequency = 0;
+        
+        Object.entries(nameFrequency).forEach(([name, freq]) => {
+            if (freq > maxFrequency) {
+                maxFrequency = freq;
+                originalName = name;
+            }
+        });
+        
+        // تحديد الأسماء المختلفة
+        const differentNames = Object.keys(nameData).filter(name => name !== originalName);
+        
+        return {
+            originalName,
+            differentNames,
+            nameData,
+            nameFrequency
+        };
+    }
+    
+    extractNameFromNotes(notes) {
+        if (!notes || notes.trim() === '') return null;
+        
+        // إزالة الكلمات الزائدة واستخراج الاسم
+        let cleanNotes = notes.trim();
+        
+        // إزالة الكلمات الشائعة مثل "عجز" و "خدمة"
+        const wordsToRemove = ['عجز', 'خدمة', 'خدمات', 'مدين', 'دائن', 'سلف', 'مشتريات'];
+        
+        wordsToRemove.forEach(word => {
+            cleanNotes = cleanNotes.replace(new RegExp(word, 'gi'), '');
+        });
+        
+        // إزالة الفواصل والرقام والرموز غير الضرورية
+        cleanNotes = cleanNotes.replace(/[0-9\.,\-\/\\:;(){}\[\]]/g, ' ');
+        
+        // إزالة الفراغات الزائدة
+        cleanNotes = cleanNotes.replace(/\s+/g, ' ').trim();
+        
+        // التحقق من وجود اسم (على الأقل كلمتين)
+        const words = cleanNotes.split(' ').filter(word => word.length > 1);
+        
+        if (words.length >= 2) {
+            // أخذ أول كلمتين كاسم
+            return words.slice(0, 2).join(' ');
+        } else if (words.length === 1 && words[0].length >= 3) {
+            // إذا كانت كلمة واحدة وطويلة
+            return words[0];
+        }
+        
+        return null;
+    }
+    
     showResults() {
         // عرض نتائج العجز
         document.getElementById('deficitDebit').textContent = this.formatNumber(this.results.deficit.debit);
@@ -179,6 +266,9 @@ class FinancialAnalyzer {
         document.getElementById('advancesDebit').textContent = this.formatNumber(this.results.advances.debit);
         document.getElementById('advancesCredit').textContent = this.formatNumber(this.results.advances.credit);
         document.getElementById('advancesNet').textContent = this.formatNumber(this.results.advances.net);
+        
+        // عرض نتائج الأسماء
+        this.showNamesResults();
         
         // عرض الملخص النهائي
         document.getElementById('totalAdvances').textContent = this.formatNumber(this.results.advances.net);
@@ -214,6 +304,69 @@ class FinancialAnalyzer {
         } else {
             loading.style.display = 'none';
         }
+    }
+    
+    showNamesResults() {
+        if (!this.namesResults || !this.namesResults.nameData) return;
+        
+        const { originalName, differentNames, nameData } = this.namesResults;
+        const namesContainer = document.getElementById('namesContainer');
+        const namesSection = document.getElementById('namesSection');
+        
+        // مسح المحتوى السابق
+        namesContainer.innerHTML = '';
+        
+        // إذا لم يتم العثور على أسماء، إخفاء هذا القسم
+        if (!originalName && differentNames.length === 0) {
+            namesSection.style.display = 'none';
+            return;
+        }
+        
+        // عرض قسم الأسماء
+        namesSection.style.display = 'block';
+        
+        // عرض الاسم الأصلي
+        if (originalName && nameData[originalName]) {
+            const nameBox = this.createNameBox(originalName, nameData[originalName], true);
+            namesContainer.appendChild(nameBox);
+        }
+        
+        // عرض الأسماء المختلفة
+        differentNames.forEach(name => {
+            if (nameData[name]) {
+                const nameBox = this.createNameBox(name, nameData[name], false);
+                namesContainer.appendChild(nameBox);
+            }
+        });
+    }
+    
+    createNameBox(name, data, isOriginal) {
+        const nameBox = document.createElement('div');
+        nameBox.className = `name-box ${isOriginal ? 'original-name' : 'different-name'}`;
+        
+        nameBox.innerHTML = `
+            <h4>${name} ${isOriginal ? '(الاسم الأصلي)' : '(اسم مختلف)'}</h4>
+            <div class="calculation-grid">
+                <div class="calc-item">
+                    <span class="label">مدين:</span>
+                    <span class="value">${this.formatNumber(data.debit)}</span>
+                </div>
+                <div class="calc-item">
+                    <span class="label">دائن:</span>
+                    <span class="value">${this.formatNumber(data.credit)}</span>
+                </div>
+                <div class="calc-item total">
+                    <span class="label">الصافي:</span>
+                    <span class="value">${this.formatNumber(data.net)}</span>
+                </div>
+                <div class="calc-item">
+                    <span class="label">عدد العمليات:</span>
+                    <span class="value">${data.count}</span>
+                </div>
+            </div>
+        `;
+        
+        return nameBox;
     }
 }
 
